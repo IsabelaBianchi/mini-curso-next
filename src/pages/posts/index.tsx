@@ -1,7 +1,35 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.scss'
+import { GetStaticProps } from 'next';
 
-export default function Home() {
-  return <h1>Posts</h1>;
+interface Post {
+  id: string;
+  title: string;
 }
+
+interface PostsProps {
+  posts: Post[];
+}
+
+export default function Posts({ posts }: PostsProps) {
+  return (
+    <div>
+      <h1>Listagem de Posts</h1>
+      <ul>
+        {posts.map(post => (
+          <li key={post.id}>{post.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export const getStaticProps: GetStaticProps<PostsProps> = async () => {
+  const response = await fetch('http://localhost:3333/posts');
+  const posts = await response.json();
+
+  return {
+    props: {
+      posts,
+    },
+      revalidate: 5, //in seconds
+  };
+};
